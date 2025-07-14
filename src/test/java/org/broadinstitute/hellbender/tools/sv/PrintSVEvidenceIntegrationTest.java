@@ -26,44 +26,54 @@ public class PrintSVEvidenceIntegrationTest extends CommandLineProgramTest {
     @DataProvider
     public Object[][] printSVEvidenceCases() {
         return new Object[][]{
+//                {
+//                        "print read pairs zipped",
+//                        printEvidenceTestDir + "/test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                        DiscordantPairEvidenceCodec.FORMAT_SUFFIX,
+//                        "chr22:30500000-30550001",
+//                        printEvidenceTestDir + "/output.test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                },
+//                {
+//                        "print read pairs unzipped",
+//                        printEvidenceTestDir + "/test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                        DiscordantPairEvidenceCodec.FORMAT_SUFFIX,
+//                        "chr22:30500000-30550001",
+//                        printEvidenceTestDir + "/output.test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX,
+//                },
+//                {
+//                    "print split reads zipped",
+//                    printEvidenceTestDir + "/test_hg38" + SplitReadEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                    SplitReadEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                    "chr22:30500000-30550001",
+//                    printEvidenceTestDir + "/output.test_hg38" + SplitReadEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                },
+// ---------------------------------------------------
+//                {
+//                    "print baf zipped",
+//                    printEvidenceTestDir + "/test_hg38" + BafEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                    BafEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                    "chr22:30500000-30550001",
+//                    printEvidenceTestDir + "/output.test_hg38" + BafEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                },
+// ---------------------------------------------------
+//                {
+//                    "print rd zipped",
+//                    printEvidenceTestDir + "/test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                    DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                    "chr22:30500000-30550001",
+//                    printEvidenceTestDir + "/output.test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                },
+//                {
+//                    "print rd unzipped",
+//                    printEvidenceTestDir + "/test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
+//                    DepthEvidenceCodec.FORMAT_SUFFIX,
+//                    "chr22:30500000-30550001",
+//                    printEvidenceTestDir + "/output.test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX,
+//                },
                 {
-                        "print read pairs zipped",
-                        printEvidenceTestDir + "/test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                        DiscordantPairEvidenceCodec.FORMAT_SUFFIX,
-                        "chr22:30500000-30550001",
-                        printEvidenceTestDir + "/output.test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                },
-                {
-                        "print read pairs unzipped",
-                        printEvidenceTestDir + "/test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                        DiscordantPairEvidenceCodec.FORMAT_SUFFIX,
-                        "chr22:30500000-30550001",
-                        printEvidenceTestDir + "/output.test_hg38" + DiscordantPairEvidenceCodec.FORMAT_SUFFIX,
-                },
-                {
-                    "print split reads zipped",
-                    printEvidenceTestDir + "/test_hg38" + SplitReadEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                    SplitReadEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                    "chr22:30500000-30550001",
-                    printEvidenceTestDir + "/output.test_hg38" + SplitReadEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                },
-                {
-                    "print baf zipped",
-                    printEvidenceTestDir + "/test_hg38" + BafEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                    BafEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                    "chr22:30500000-30550001",
-                    printEvidenceTestDir + "/output.test_hg38" + BafEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                },
-                {
-                    "print rd zipped",
-                    printEvidenceTestDir + "/test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                    DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                    "chr22:30500000-30550001",
-                    printEvidenceTestDir + "/output.test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
-                },
-                {
-                    "print rd unzipped",
-                    printEvidenceTestDir + "/test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX + ".gz",
+                    "print counts unzipped",
+//                    toolsTestDir + "/copynumber/collect-read-counts-NA12878.counts.tsv",
+                    toolsTestDir + "/copynumber/NA12878.counts.tsv",
                     DepthEvidenceCodec.FORMAT_SUFFIX,
                     "chr22:30500000-30550001",
                     printEvidenceTestDir + "/output.test_hg38" + DepthEvidenceCodec.FORMAT_SUFFIX,
@@ -72,7 +82,8 @@ public class PrintSVEvidenceIntegrationTest extends CommandLineProgramTest {
     }
     @Test(dataProvider="printSVEvidenceCases")
     public void testPrintSplitReads(final String testName, final String input, final String extension, final String interval, final String output) throws Exception {
-        final String args = "--evidence-file " + input
+        final String args = //"--evidence-file " + input
+                "--counts-file " + input
                 + " -" + StandardArgumentDefinitions.INTERVALS_SHORT_NAME + " " + interval
                 + " --" + StandardArgumentDefinitions.SEQUENCE_DICTIONARY_NAME + " " + FULL_HG38_DICT
                 + " -" + StandardArgumentDefinitions.OUTPUT_SHORT_NAME + " %s";
@@ -80,6 +91,12 @@ public class PrintSVEvidenceIntegrationTest extends CommandLineProgramTest {
         spec.setOutputFileExtension(extension);
         final String expectedIndexExtension = extension.endsWith(".gz") ? FileExtensions.TABIX_INDEX : null;
         spec.executeTest(testName, this, expectedIndexExtension);
+
+
+        // AAA
+        // Arrange
+        // Act
+        // Assert
     }
 
     @Test

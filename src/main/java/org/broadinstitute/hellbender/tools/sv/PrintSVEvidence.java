@@ -1,5 +1,12 @@
 package org.broadinstitute.hellbender.tools.sv;
 
+
+// create a new tool (a new class) that processes the read counts (ReadCount feature search for this)
+// use the type SimpleCount
+// name for another tool: ConvertReadCountToSVEvidence --- the input type is gonna be SimpleCount output is gonna be SVFeature
+// the output type needs to be DepthEvidence
+
+
 import com.google.common.annotations.VisibleForTesting;
 import htsjdk.tribble.Feature;
 import org.broadinstitute.barclay.argparser.Argument;
@@ -10,8 +17,12 @@ import org.broadinstitute.hellbender.cmdline.programgroups.StructuralVariantDisc
 import org.broadinstitute.hellbender.engine.*;
 import org.broadinstitute.hellbender.exceptions.GATKException;
 import org.broadinstitute.hellbender.exceptions.UserException;
+import org.broadinstitute.hellbender.tools.copynumber.formats.collections.SimpleCountCollection;
+import org.broadinstitute.hellbender.tools.copynumber.formats.records.SimpleCount;
 import org.broadinstitute.hellbender.utils.codecs.*;
+import org.broadinstitute.hellbender.utils.io.IOUtils;
 
+import java.io.File;
 import java.util.*;
 /**
  * <p>Merges locus-sorted files of evidence for structural variation into a single output file.</p>
@@ -75,6 +86,7 @@ import java.util.*;
 @ExperimentalFeature
 public class PrintSVEvidence extends MultiFeatureWalker<SVFeature> {
     public static final String EVIDENCE_FILE_NAME = "evidence-file";
+    public static final String COUTS_FILENAME = "counts-file";
     public static final String SAMPLE_NAMES_NAME = "sample-names";
     public static final String COMPRESSION_LEVEL_NAME = "compression-level";
 
@@ -87,9 +99,23 @@ public class PrintSVEvidence extends MultiFeatureWalker<SVFeature> {
                     + DepthEvidenceCodec.FORMAT_SUFFIX + "' (may be gzipped). "
                     + "Can also handle bci rather than txt files.",
             fullName = EVIDENCE_FILE_NAME,
-            shortName = StandardArgumentDefinitions.FEATURE_SHORT_NAME
+            shortName = StandardArgumentDefinitions.FEATURE_SHORT_NAME,
+            mutex = COUTS_FILENAME
     )
     private List<FeatureInput<SVFeature>> inputPaths;
+
+    @Argument(
+            doc = "test",
+            fullName = COUTS_FILENAME,
+            shortName = "X" // TODO
+    )
+    private List<FeatureInput<SimpleCount>> countsPaths;
+    // Cannot read file:///.../tools/copynumber/collect-read-counts-NA12878-expected.tsv because no suitable codecs found
+
+
+    // TODO: look for mutex for mutually exclusive arguments
+    // choose anyname for the second argument (read-counts files)
+
 
     @Argument(doc = "List of sample names to extract from the sources (either as a .list file or " +
             " as repeated arguments).  If not specified, all samples will be merged.",
@@ -128,19 +154,36 @@ public class PrintSVEvidence extends MultiFeatureWalker<SVFeature> {
                     outputClass.getSimpleName() + " but this tool requires an SVFeature subtype.");
         }
 
-        for ( FeatureInput<SVFeature> input : inputPaths ) {
-            try {
-                final Class<? extends Feature> inputClass =
-                        input.getFeatureCodecClass().getDeclaredConstructor().newInstance().getFeatureType();
-                if ( !outputClass.isAssignableFrom(inputClass) ) {
-                    throw new UserException("Incompatible feature input " + input.getFeaturePath() +
-                            " produces features of type " + inputClass.getSimpleName() +
-                            " rather than features of type " + outputClass.getSimpleName() +
-                            " as dictated by the output path " + outputFilePath);
+        if (inputPaths.isEmpty()) {
+            for ( FeatureInput<SimpleCount> input : countsPaths) {
+                try {
+                    final Class<? extends Feature> inputClass =
+                            input.getFeatureCodecClass().getDeclaredConstructor().newInstance().getFeatureType();
+
+                    // we assume the output type is assignable from the input type
+                    inputPaths = ConvertTo(countsPaths);
                 }
-            } catch ( final ReflectiveOperationException roe ) {
-                throw new GATKException("Failed to instantiate codec " +
-                                            input.getFeatureCodecClass().getSimpleName());
+                catch ( final ReflectiveOperationException roe ) {
+                    throw new GATKException("Failed to instantiate codec " +
+                            input.getFeatureCodecClass().getSimpleName());
+                }
+            }
+        }
+        else {
+            for ( FeatureInput<SVFeature> input : inputPaths ) {
+                try {
+                    final Class<? extends Feature> inputClass =
+                            input.getFeatureCodecClass().getDeclaredConstructor().newInstance().getFeatureType();
+                    if ( !outputClass.isAssignableFrom(inputClass) ) {
+                        throw new UserException("Incompatible feature input " + input.getFeaturePath() +
+                                " produces features of type " + inputClass.getSimpleName() +
+                                " rather than features of type " + outputClass.getSimpleName() +
+                                " as dictated by the output path " + outputFilePath);
+                    }
+                } catch ( final ReflectiveOperationException roe ) {
+                    throw new GATKException("Failed to instantiate codec " +
+                                                input.getFeatureCodecClass().getSimpleName());
+                }
             }
         }
         if ( sampleNames.isEmpty() ) {
@@ -171,6 +214,30 @@ public class PrintSVEvidence extends MultiFeatureWalker<SVFeature> {
             }
         }
         outputSink.write(feature);
+    }
+
+    /*
+    @Override
+    public void apply( final SimpleCount featureArg,
+                       final Object header,
+                       final ReadsContext readsContext,
+                       final ReferenceContext referenceContext ) {
+        int t = 10;
+
+    }*/
+
+    private List<FeatureInput<SVFeature>> ConvertTo(List<FeatureInput<SimpleCount>> countsPaths)
+    {
+        List<FeatureInput<SVFeature>> features = new ArrayList<>();
+        final DepthEvidenceCodec depthCodec = new DepthEvidenceCodec();
+
+        for (final FeatureInput<SimpleCount> singleCountPath : countsPaths) {
+            final File tempSVEvidenceFile = IOUtils.createTempFile("converted-sv-evidence-", ".rd.txt");
+            tempSVEvidenceFile.deleteOnExit();
+
+        }
+
+        return features;
     }
 
     @Override

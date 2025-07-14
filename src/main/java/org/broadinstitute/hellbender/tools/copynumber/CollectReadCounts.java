@@ -196,6 +196,7 @@ public final class CollectReadCounts extends ReadWalker {
     @Override
     public Object onTraversalSuccess() {
         logger.info(String.format("Writing read counts to %s...", outputCountsFile.getAbsolutePath()));
+        // -------------------------------------------------
         final SimpleCountCollection readCounts = new SimpleCountCollection(
                 metadata,
                 ImmutableList.copyOf(intervals.stream()     //making this an ImmutableList avoids a defensive copy in SimpleCountCollection

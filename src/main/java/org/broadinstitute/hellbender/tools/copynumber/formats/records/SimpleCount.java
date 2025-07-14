@@ -4,6 +4,7 @@ import htsjdk.samtools.util.Locatable;
 import htsjdk.tribble.Feature;
 import htsjdk.tribble.NamedFeature;
 import org.broadinstitute.hellbender.exceptions.UserException;
+import org.broadinstitute.hellbender.tools.sv.SVFeature;
 import org.broadinstitute.hellbender.utils.SimpleInterval;
 import org.broadinstitute.hellbender.utils.Utils;
 import org.broadinstitute.hellbender.utils.param.ParamUtils;
@@ -74,4 +75,10 @@ public class SimpleCount implements Locatable, Feature {
                 ", count=" + count +
                 '}';
     }
+
+    /*
+    public static SVFeature ToSVFeature(SimpleCount obj)
+    {
+
+    }*/
 }

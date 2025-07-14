@@ -22,7 +22,7 @@ public final class CollectReadCountsIntegrationTest extends CommandLineProgramTe
     private static final File TEST_SUB_DIR = new File(toolsTestDir, "copynumber");
 
     private static final File NA12878_BAM = new File(TEST_SUB_DIR, "collect-read-counts-NA12878.bam");
-    private static final File NA12878_READ_COUNTS_EXPECTED_OUTPUT = new File(TEST_SUB_DIR, "collect-read-counts-NA12878-expected.tsv");
+    private static final File NA12878_READ_COUNTS_EXPECTED_OUTPUT = new File(TEST_SUB_DIR, "collect-read-counts-NA12878-expected.tsv"); ///////////// ---------------
     private static final File INTERVALS_FILE = new File(TEST_SUB_DIR, "collect-read-counts-test.interval_list");
 
     @DataProvider(name = "testData")

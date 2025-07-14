@@ -92,7 +92,7 @@ public final class SimpleCountCollection extends AbstractSampleLocatableCollecti
      * @param intervalSubset    if {@code null} or empty, all counts will be returned
      */
     public static SimpleCountCollection readAndSubset(final File file,
-                                                      final Set<SimpleInterval> intervalSubset) {
+                                                      final Set<SimpleInterval> intervalSubset) { // ---------------------
         IOUtils.canReadFile(file);
         final SimpleCountCollection simpleCounts = IOUtils.isHDF5File(file.toPath())
                 ? readHDF5(new HDF5File(file))

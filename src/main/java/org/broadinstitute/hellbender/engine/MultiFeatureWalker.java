@@ -7,6 +7,7 @@ import htsjdk.variant.vcf.VCFHeader;
 import org.broadinstitute.hellbender.cmdline.StandardArgumentDefinitions;
 import org.broadinstitute.hellbender.engine.filters.CountingReadFilter;
 import org.broadinstitute.hellbender.exceptions.UserException;
+import org.broadinstitute.hellbender.tools.copynumber.formats.records.SimpleCount;
 import org.broadinstitute.hellbender.utils.IntervalUtils;
 import org.broadinstitute.hellbender.utils.SimpleInterval;
 import org.broadinstitute.hellbender.tools.sv.SVFeaturesHeader;
@@ -69,7 +70,19 @@ public abstract class MultiFeatureWalker<F extends Feature> extends WalkerBase {
             final PQEntry<F> entry = iterator.next();
             final F feature = entry.getFeature();
             final SimpleInterval featureInterval = new SimpleInterval(feature);
-            apply(feature,
+
+            // test
+            entry.getHeader();
+            ReadsContext test = new ReadsContext(reads, featureInterval, readFilter);
+            // class
+            // org.broadinstitute.hellbender.tools.copynumber.formats.records.SimpleCount c
+            // annot be cast to class
+            // org.broadinstitute.hellbender.tools.sv.SVFeature
+            //
+
+
+
+                apply(feature,
                     entry.getHeader(),
                     new ReadsContext(reads, featureInterval, readFilter),
                     new ReferenceContext(reference, featureInterval));
@@ -91,6 +104,14 @@ public abstract class MultiFeatureWalker<F extends Feature> extends WalkerBase {
                                 final Object header,
                                 final ReadsContext readsContext,
                                 final ReferenceContext referenceContext );
+
+    public void apply( final SimpleCount feature,
+                                final Object header,
+                                final ReadsContext readsContext,
+                                final ReferenceContext referenceContext )
+    {
+        int x = 10;
+    }
 
     /**
      * Get the dictionary we settled on
